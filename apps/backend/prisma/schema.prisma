@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model FeaturedProductPreference {
+  id        Int    @id @default(autoincrement())
+  scope     String
+  productId Int
+  rank      Int
+
+  @@unique([scope, productId])
+  @@index([scope, rank])
+}
+
+model Enquiry {
+  id           Int      @id @default(autoincrement())
+  productId    Int
+  productTitle String
+  name         String
+  email        String
+  phone        String?
+  message      String
+  createdAt    DateTime @default(now())
+}
