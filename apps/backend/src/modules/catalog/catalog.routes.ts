@@ -1,0 +1,33 @@
+import type { Router } from '../../shared/http/router.js'
+import { json } from '../../shared/http/helpers.js'
+import { wrap } from '../../shared/http/middleware.js'
+import type { CatalogService } from './catalog.service.js'
+import { productIdParamSchema } from './catalog.schemas.js'
+
+export function registerCatalogRoutes(router: Router, service: CatalogService): void {
+  router.get('/api/products', wrap(async (req, res) => {
+    const url = new URL(req.url!, 'http://localhost')
+    const q = url.searchParams.get('q')
+    json(res, q ? await service.search(q) : await service.getProducts())
+  }))
+
+  router.get('/api/products/featured', wrap(async (req, res) => {
+    const url = new URL(req.url!, 'http://localhost')
+    const scope = url.searchParams.get('scope') ?? 'global'
+    json(res, await service.getFeatured(scope))
+  }))
+
+  router.get('/api/products/:id', wrap(async (req, res, params) => {
+    const parsed = productIdParamSchema.safeParse({ id: params.id })
+    if (!parsed.success) return json(res, { error: 'Invalid id' }, 400)
+    json(res, await service.getProduct(parsed.data.id))
+  }))
+
+  router.get('/api/categories', wrap(async (req, res) => {
+    json(res, await service.getCategories())
+  }))
+
+  router.get('/api/categories/:category/products', wrap(async (req, res, params) => {
+    json(res, await service.getCategoryProducts(decodeURIComponent(params.category)))
+  }))
+}
