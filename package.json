@@ -1,0 +1,25 @@
+{
+  "name": "catalog",
+  "private": true,
+  "version": "0.0.1",
+  "packageManager": "pnpm@10.20.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "concurrently --names \"api,web\" --prefix-colors \"cyan,magenta\" \"pnpm --filter @catalog/backend dev\" \"pnpm --filter @catalog/frontend dev\"",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:e2e": "playwright test",
+    "prisma:migrate": "pnpm --filter @catalog/backend prisma:migrate",
+    "prisma:generate": "pnpm --filter @catalog/backend prisma:generate",
+    "seed": "pnpm --filter @catalog/backend seed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "concurrently": "^8.2.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "esbuild", "prisma"]
+  }
+}

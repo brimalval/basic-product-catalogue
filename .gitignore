@@ -1,0 +1,33 @@
+node_modules/
+dist/
+
+# SQLite
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Dev mail captures
+.dev-mail/
+
+# Evidence artifacts
+.sisyphus/evidence/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma
+apps/backend/prisma/dev.db
+apps/backend/prisma/*.db
