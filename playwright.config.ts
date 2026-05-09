@@ -21,7 +21,7 @@ export default defineConfig({
   webServer: [
     {
       command: 'pnpm --filter @catalog/backend dev',
-      url: 'http://localhost:3001/api/health',
+      url: 'http://localhost:3001/health',
       reuseExistingServer: !process.env.CI,
       timeout: 15_000,
     },
