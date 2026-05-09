@@ -5,6 +5,7 @@ export class PrismaEnquiryRepository implements IEnquiryRepository {
   constructor(private readonly db: PrismaClient) {}
 
   async create(data: EnquiryInput): Promise<Enquiry> {
-    return this.db.enquiry.create({ data })
+    const row = await this.db.enquiry.create({ data })
+    return { ...row, phone: row.phone ?? undefined }
   }
 }

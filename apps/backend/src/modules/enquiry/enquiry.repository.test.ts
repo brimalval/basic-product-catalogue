@@ -39,7 +39,7 @@ describe('PrismaEnquiryRepository', () => {
     expect(result.productId).toBe(1)
     expect(result.name).toBe('Jane Doe')
     expect(result.email).toBe('jane@example.com')
-    expect(result.phone).toBeNull()
+    expect(result.phone).toBeUndefined()
     expect(result.message).toBe('I am interested')
     expect(result.createdAt).toBeInstanceOf(Date)
   })
