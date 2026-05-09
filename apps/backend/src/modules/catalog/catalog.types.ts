@@ -18,3 +18,10 @@ export interface FeaturedProductPreference {
 export interface IFeaturedRepository {
   findByScope(scope: string): Promise<FeaturedProductPreference[]>
 }
+
+export interface ProductProvider {
+  getProducts(): Promise<Product[]>
+  getProduct(id: number): Promise<Product>
+  getCategories(): Promise<string[]>
+  getCategoryProducts(category: string): Promise<Product[]>
+}
