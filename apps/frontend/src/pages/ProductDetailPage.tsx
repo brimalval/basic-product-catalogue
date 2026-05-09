@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -11,6 +11,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
+import { Breadcrumb } from '@/components/layout/Breadcrumb'
+import { StarRating } from '@/components/catalog/StarRating'
+import { RelatedProducts } from '@/components/catalog/RelatedProducts'
 
 const enquirySchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -52,11 +55,15 @@ export function ProductDetailPage() {
 
   if (!product) return null
 
+  const crumbs = [
+    { label: 'Home', href: '/' },
+    { label: 'Products', href: '/products' },
+    { label: product.title.length > 40 ? product.title.slice(0, 40) + '…' : product.title },
+  ]
+
   return (
     <main className="container mx-auto px-4 py-8">
-      <Link to="/products" className="text-sm text-muted-foreground hover:text-foreground mb-6 block">
-        ← Back to products
-      </Link>
+      <Breadcrumb crumbs={crumbs} />
       <div className="grid gap-12 lg:grid-cols-2">
         <div className="aspect-square flex items-center justify-center bg-muted rounded-xl p-8">
           <img src={product.image} alt={product.title} className="max-h-80 object-contain" />
@@ -65,10 +72,7 @@ export function ProductDetailPage() {
           <Badge variant="secondary" className="capitalize">{product.category}</Badge>
           <h1 className="text-2xl font-bold leading-tight">{product.title}</h1>
           <p className="text-3xl font-bold">${product.price.toFixed(2)}</p>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>★ {product.rating.rate}</span>
-            <span>({product.rating.count} reviews)</span>
-          </div>
+          <StarRating rate={product.rating.rate} count={product.rating.count} size="md" />
           <p className="text-muted-foreground leading-relaxed">{product.description}</p>
 
           <Separator className="my-2" />
@@ -142,6 +146,7 @@ export function ProductDetailPage() {
           </div>
         </div>
       </div>
+      <RelatedProducts category={product.category} excludeId={product.id} />
     </main>
   )
 }

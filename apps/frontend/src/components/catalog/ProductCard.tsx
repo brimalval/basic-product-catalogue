@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { StarRating } from './StarRating'
 import type { Product } from '@/lib/types'
 
 interface Props {
@@ -24,8 +25,9 @@ export function ProductCard({ product }: Props) {
           </Badge>
           <h3 className="text-sm font-medium leading-tight line-clamp-2">{product.title}</h3>
         </CardContent>
-        <CardFooter className="px-4 pb-4 pt-0">
+        <CardFooter className="px-4 pb-4 pt-0 flex items-center justify-between">
           <span className="font-semibold">${product.price.toFixed(2)}</span>
+          <StarRating rate={product.rating.rate} />
         </CardFooter>
       </Card>
     </Link>
