@@ -23,5 +23,8 @@ export const setFeaturedBodySchema = z.object({
       productId: z.number().int().positive(),
       rank: z.number().int().min(1),
     }),
+  ).max(50).refine(
+    (items) => new Set(items.map((i) => i.productId)).size === items.length,
+    { message: 'productId values must be unique' },
   ),
 })

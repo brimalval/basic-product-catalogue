@@ -2,19 +2,25 @@ import type { Router } from '../../shared/http/router.js'
 import { json, readBody } from '../../shared/http/helpers.js'
 import { wrap } from '../../shared/http/middleware.js'
 import type { CatalogService } from './catalog.service.js'
-import { categoryParamSchema, productIdParamSchema, setFeaturedBodySchema } from './catalog.schemas.js'
+import { categoryParamSchema, productIdParamSchema, scopeQuerySchema, searchQuerySchema, setFeaturedBodySchema } from './catalog.schemas.js'
 
 export function registerCatalogRoutes(router: Router, service: CatalogService): void {
   router.get('/api/products', wrap(async (req, res) => {
     const url = new URL(req.url!, 'http://localhost')
-    const q = url.searchParams.get('q')
-    json(res, q ? await service.search(q) : await service.getProducts())
+    const rawQ = url.searchParams.get('q')
+    if (rawQ !== null) {
+      const parsed = searchQuerySchema.safeParse({ q: rawQ })
+      if (!parsed.success) return json(res, { error: parsed.error.flatten() }, 400)
+      return json(res, await service.search(parsed.data.q))
+    }
+    json(res, await service.getProducts())
   }))
 
   router.get('/api/products/featured', wrap(async (req, res) => {
     const url = new URL(req.url!, 'http://localhost')
-    const scope = url.searchParams.get('scope') ?? 'global'
-    json(res, await service.getFeatured(scope))
+    const parsed = scopeQuerySchema.safeParse({ scope: url.searchParams.get('scope') ?? undefined })
+    if (!parsed.success) return json(res, { error: parsed.error.flatten() }, 400)
+    json(res, await service.getFeatured(parsed.data.scope))
   }))
 
   router.put('/api/products/featured', wrap(async (req, res) => {

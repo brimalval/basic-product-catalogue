@@ -33,9 +33,10 @@ function productUrl(enquiry: Enquiry): string | null {
 }
 
 function salesBody(enquiry: Enquiry): string {
+  const url = productUrl(enquiry)
   return [
     `New enquiry received for: ${enquiry.productTitle}`,
-    productUrl(enquiry) ? `Product URL: ${productUrl(enquiry)}` : null,
+    url ? `Product URL: ${url}` : null,
     '',
     `Name:    ${enquiry.name}`,
     `Email:   ${enquiry.email}`,
@@ -45,11 +46,12 @@ function salesBody(enquiry: Enquiry): string {
     `Product ID: ${enquiry.productId}`,
     `Submitted:  ${enquiry.createdAt.toISOString()}`,
   ]
-    .filter((line) => line !== null)
+    .filter((line): line is string => line !== null)
     .join('\n')
 }
 
 function customerBody(enquiry: Enquiry): string {
+  const url = productUrl(enquiry)
   return [
     `Hi ${enquiry.name},`,
     '',
@@ -58,13 +60,13 @@ function customerBody(enquiry: Enquiry): string {
     'Here is a summary of what you submitted:',
     '',
     `Product: ${enquiry.productTitle}`,
-    productUrl(enquiry) ? `Link:    ${productUrl(enquiry)}` : null,
+    url ? `Link:    ${url}` : null,
     enquiry.phone ? `Phone:   ${enquiry.phone}` : null,
     `Message: ${enquiry.message}`,
     '',
     'We appreciate your interest and will be in touch soon.',
   ]
-    .filter((line) => line !== null)
+    .filter((line): line is string => line !== null)
     .join('\n')
 }
 
