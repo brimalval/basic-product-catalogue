@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { useProduct } from '@/hooks/use-catalog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +10,7 @@ import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import { StarRating } from '@/components/catalog/StarRating'
 import { RelatedProducts } from '@/components/catalog/RelatedProducts'
 import { EnquiryModal } from '@/components/catalog/EnquiryModal'
+import { useSeo } from '@/hooks/use-seo'
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -37,8 +39,31 @@ export function ProductDetailPage() {
     { label: product.title.length > 40 ? product.title.slice(0, 40) + '…' : product.title },
   ]
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    image: product.image,
+    description: product.description,
+    offers: {
+      '@type': 'Offer',
+      price: product.price,
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: product.rating.rate,
+      reviewCount: product.rating.count,
+    },
+  }
+
   return (
     <main className="container mx-auto px-4 py-8">
+      {useSeo({ title: product.title, description: product.description, image: product.image, type: 'product', path: `/products/${product.id}` })}
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
       <Breadcrumb crumbs={crumbs} />
       <div className="grid gap-12 lg:grid-cols-2">
         <div className="aspect-square flex items-center justify-center bg-muted rounded-xl p-8">

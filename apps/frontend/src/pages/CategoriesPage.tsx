@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useCategories, useProducts } from '@/hooks/use-catalog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
+import { useSeo } from '@/hooks/use-seo'
 import type { Product } from '@/lib/types'
 
 const crumbs = [
@@ -25,6 +26,7 @@ export function CategoriesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {useSeo({ title: 'Categories', description: 'Browse all product categories.', path: '/categories' })}
       <Breadcrumb crumbs={crumbs} />
       <h1 className="text-3xl font-bold tracking-tight mb-6">Categories</h1>
 
