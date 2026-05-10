@@ -1,4 +1,4 @@
-# Architecture
+# Codebase Structure
 
 ## Overview
 
@@ -8,6 +8,8 @@ A pnpm monorepo with two workspaces:
 apps/
   backend/    Node.js HTTP server (native http module)
   frontend/   React + Vite SPA
+e2e/          Playwright end-to-end tests
+docs/         Project documentation
 ```
 
 The frontend communicates exclusively with the backend. The backend proxies requests to Fake Store API — the frontend never calls the external API directly.
@@ -27,6 +29,9 @@ src/
     http/          Router, helpers, middleware
   app.ts           createApp() factory
   server.ts        Composition root + server startup
+prisma/
+  schema.prisma    Database schema
+  seed.ts          Featured product seeding script
 ```
 
 Each module contains:
@@ -89,20 +94,32 @@ src/
     theme.css    CSS design tokens — edit here to retheme the site (see THEMING.md)
   components/
     ui/          shadcn/ui primitives (Button, Card, Input, Carousel, Dialog, etc.)
-                 ScrollToTop — fixed floating button for infinite-scroll pages
-    layout/      Header (nav, search + live suggestions), Sidebar (category drawer),
-                 Footer (brand, nav links, social, enquiry CTA)
-    catalog/     ProductCard, ProductCarousel, EnquiryModal,
-                 SearchSuggestions (live client-side dropdown), SortFilterBar
+                 ScrollToTop — fixed floating scroll-to-top button
+    layout/      Header (nav, search + live suggestions, hamburger toggle),
+                 Sidebar (full-screen category nav drawer),
+                 Footer (brand, nav links, social links, enquiry CTA),
+                 Breadcrumb (reusable breadcrumb nav)
+    catalog/     ProductCard (image, price, rating, hover animation),
+                 ProductCarousel (featured product carousel),
+                 StarRating (star display with count),
+                 RelatedProducts (same-category product grid),
+                 EnquiryModal (enquiry form with react-hook-form + Zod),
+                 SearchSuggestions (live client-side dropdown),
+                 SortFilterBar (sort + multi-category pill filters via URL state)
   pages/
-    HomePage.tsx           Featured carousel + infinite-scroll browse catalog
-    CatalogPage.tsx        All products / search results with infinite scroll
-    CategoriesPage.tsx     Category grid with thumbnails
-    CategoryPage.tsx       Featured carousel + infinite-scroll products for one category
-    ProductDetailPage.tsx  Product detail + enquiry modal + JSON-LD structured data
-  App.tsx        Route definitions, sidebar state, Footer placement
+    HomePage.tsx           Hero section + featured carousel + infinite-scroll browse grid
+    CatalogPage.tsx        All products / search results with sort + multi-category filters
+    CategoriesPage.tsx     Category grid with product count badges and thumbnails
+    CategoryPage.tsx       Featured carousel + infinite-scroll product grid for one category
+    ProductDetailPage.tsx  Product detail + sticky info panel + enquiry modal + JSON-LD
+  index.css      Global styles + grain noise texture overlay (body::after)
+  App.tsx        Route definitions, sidebar state, layout shell
   main.tsx       React root, QueryClient, BrowserRouter, HelmetProvider
 ```
+
+### Design system
+
+The visual layer is driven by CSS custom properties in `src/styles/theme.css` (warm terracotta palette). Animations use custom cubic-bezier spring physics (`ease-[cubic-bezier(0.32,0.72,0,1)]`). Skeleton loaders use a directional shimmer keyframe defined in `tailwind.config.ts`. Scroll-triggered entrance animations use `react-intersection-observer` (`useInView`). See `THEMING.md` for the full token reference.
 
 ### Data flow
 
@@ -112,7 +129,8 @@ src/
 4. TanStack Query caches the response (staleTime: 30s). Skeleton UI shown during loading.
 5. For enquiries: `react-hook-form` validates locally with Zod → submits via `useEnquiry` mutation → backend validates again with Zod, persists, triggers mail adapter.
 6. Search suggestions filter the already-cached `useProducts()` result client-side — no extra API calls.
-7. Featured products are fetched from SQLite via `GET /api/products/featured?scope=<scope>`. The `scope` is `global` on the home page and the category slug on category pages.
+7. Multi-category filtering on the catalog page reads `?cat=` URL params (multiple allowed) and filters client-side — no backend changes required.
+8. Featured products are fetched from SQLite via `GET /api/products/featured?scope=<scope>`. The `scope` is `global` on the home page and the category slug on category pages.
 
 ### Managing featured products
 

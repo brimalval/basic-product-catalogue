@@ -13,13 +13,13 @@ pnpm install
 
 ## Environment
 
-Create `apps/backend/.env` (copy from `.env.example`):
+Create `apps/backend/.env` by copying the example file:
 
-```env
-DATABASE_URL="file:./prisma/dev.db"
-PORT=3001
-NODE_ENV=development
+```bash
+cp apps/backend/.env.example apps/backend/.env
 ```
+
+The required vars (`DATABASE_URL`, `PORT`, `NODE_ENV`) are already filled in the example. Edit them only if you need non-default values.
 
 **SMTP (optional — dev stub is active by default)**
 
@@ -67,14 +67,24 @@ pnpm --filter @catalog/frontend dev
 
 ## Testing
 
+### Unit + integration tests
+
 ```bash
-pnpm test          # unit + integration tests (backend only)
+pnpm test
 ```
 
 Backend test coverage includes:
 - Repository tests (SQLite integration, isolated temp DB per run)
 - Service tests (mocked dependencies)
 - HTTP layer tests (real HTTP server, mocked services)
+
+### End-to-end tests
+
+```bash
+pnpm test:e2e
+```
+
+Runs Playwright against Chromium. The test runner automatically starts both the backend and frontend dev servers — no manual `pnpm dev` needed before running E2E tests. Tests live in `e2e/catalog.spec.ts`.
 
 ## Build
 
@@ -93,6 +103,23 @@ pnpm --filter @catalog/frontend preview
 ## Dev mail
 
 Enquiry submissions are written to `.dev-mail/` as JSON files (gitignored). No SMTP setup required.
+
+## Troubleshooting
+
+**Port already in use**
+The backend defaults to `:3001` and the frontend to `:5173`. If either port is occupied:
+- Find and stop the conflicting process: `lsof -i :3001` / `lsof -i :5173`
+- Or change the backend port via `PORT=<other>` in `.env` and update the Vite proxy in `apps/frontend/vite.config.ts` to match.
+
+**`pnpm prisma:migrate` fails**
+- Ensure `DATABASE_URL` is set in `apps/backend/.env`.
+- If the SQLite file is corrupt, delete `apps/backend/prisma/dev.db` and re-run migrate + seed.
+
+**Fake Store API is unavailable**
+The backend proxies product data from `https://fakestoreapi.com`. If the upstream API is down, product endpoints will return `502`. There is no offline fallback — wait for the upstream to recover or mock the adapter in development.
+
+**Enquiries not arriving by email**
+Without SMTP vars set, enquiries are written to `.dev-mail/*.json` (gitignored) as a dev stub. Check that directory first. To send real emails, set all `SMTP_*` vars in `.env` (see Environment section above).
 
 ## Before deploying to production
 
