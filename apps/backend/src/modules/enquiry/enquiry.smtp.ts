@@ -27,6 +27,11 @@ function loadConfig(): SmtpConfig {
   }
 }
 
+// Strip CR/LF characters to prevent SMTP header injection via user-supplied fields.
+function sanitizeHeader(value: string): string {
+  return value.replace(/[\r\n]+/g, ' ').trim()
+}
+
 function productUrl(enquiry: Enquiry): string | null {
   const base = process.env.FRONTEND_URL
   return base ? `${base}/products/${enquiry.productId}` : null
@@ -86,13 +91,13 @@ export function createSmtpMailAdapter(): MailPort {
         transport.sendMail({
           from: config.from,
           to: config.to,
-          subject: `New Enquiry — ${enquiry.productTitle}`,
+          subject: `New Enquiry — ${sanitizeHeader(enquiry.productTitle)}`,
           text: salesBody(enquiry),
         }),
         transport.sendMail({
           from: config.from,
           to: enquiry.email,
-          subject: `Thanks for your enquiry — ${enquiry.productTitle}`,
+          subject: `Thanks for your enquiry — ${sanitizeHeader(enquiry.productTitle)}`,
           text: customerBody(enquiry),
         }),
       ])

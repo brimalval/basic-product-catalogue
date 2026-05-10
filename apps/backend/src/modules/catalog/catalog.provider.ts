@@ -29,11 +29,19 @@ async function safeFetch(url: string): Promise<unknown> {
 function withTtlCache<T>(fn: () => Promise<T>): () => Promise<T> {
   let cachedValue: T | undefined
   let expiresAt = 0
+  let inFlight: Promise<T> | undefined
   return async () => {
     if (cachedValue !== undefined && Date.now() < expiresAt) return cachedValue
-    cachedValue = await fn()
-    expiresAt = Date.now() + CACHE_TTL_MS
-    return cachedValue
+    // Deduplicate concurrent callers during a cache miss so only one upstream
+    // request fires, regardless of how many requests arrive simultaneously.
+    if (inFlight) return inFlight
+    inFlight = fn().then((value) => {
+      cachedValue = value
+      expiresAt = Date.now() + CACHE_TTL_MS
+      inFlight = undefined
+      return value
+    })
+    return inFlight
   }
 }
 

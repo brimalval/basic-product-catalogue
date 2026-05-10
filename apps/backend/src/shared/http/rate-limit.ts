@@ -10,12 +10,20 @@ interface RateLimitOptions {
 export function rateLimit({ windowMs, max }: RateLimitOptions) {
   const hits = new Map<string, number[]>()
 
+  // Periodically evict IPs whose timestamps have all aged out of the window.
+  const cleanup = setInterval(() => {
+    const windowStart = Date.now() - windowMs
+    for (const [ip, timestamps] of hits) {
+      if (timestamps.every((t) => t <= windowStart)) hits.delete(ip)
+    }
+  }, windowMs)
+  cleanup.unref()
+
   return function rateLimitMiddleware(handler: Handler): Handler {
     return async (req: IncomingMessage, res: ServerResponse, params: Record<string, string>) => {
-      const ip =
-        (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0].trim() ??
-        req.socket.remoteAddress ??
-        'unknown'
+      // Use the actual TCP connection address — never trust X-Forwarded-For
+      // from untrusted clients, as it can be spoofed to bypass rate limiting.
+      const ip = req.socket.remoteAddress ?? 'unknown'
 
       const now = Date.now()
       const windowStart = now - windowMs

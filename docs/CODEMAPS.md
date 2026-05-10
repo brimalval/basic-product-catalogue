@@ -27,7 +27,7 @@ Task-oriented quick reference. Each row maps a common change to the file(s) to e
 
 | Task | File(s) |
 |------|---------|
-| Change which products are featured (global) | `apps/backend/prisma/seed.ts` → `pnpm seed`, or `PUT /api/products/featured` (see CODEBASE-STRUCTURE.md) |
+| Change which products are featured (global) | `apps/backend/prisma/seed.ts` → `pnpm seed` (see CODEBASE-STRUCTURE.md → Managing featured products) |
 | Change which products are featured (per category) | Same as above with `scope` set to the category string (e.g. `"electronics"`) |
 | Change the number of products shown on the home page | `apps/frontend/src/pages/HomePage.tsx` → `visible` slice / `PAGE_SIZE` constant |
 | Change sort options available in the filter bar | `apps/frontend/src/components/catalog/SortFilterBar.tsx` |

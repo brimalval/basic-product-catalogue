@@ -1,8 +1,8 @@
 import type { Router } from '../../shared/http/router.js'
-import { json, readBody } from '../../shared/http/helpers.js'
+import { json } from '../../shared/http/helpers.js'
 import { wrap } from '../../shared/http/middleware.js'
 import type { CatalogService } from './catalog.service.js'
-import { categoryParamSchema, productIdParamSchema, scopeQuerySchema, searchQuerySchema, setFeaturedBodySchema } from './catalog.schemas.js'
+import { categoryParamSchema, productIdParamSchema, scopeQuerySchema, searchQuerySchema } from './catalog.schemas.js'
 
 export function registerCatalogRoutes(router: Router, service: CatalogService): void {
   router.get('/api/products', wrap(async (req, res) => {
@@ -23,12 +23,9 @@ export function registerCatalogRoutes(router: Router, service: CatalogService): 
     json(res, await service.getFeatured(parsed.data.scope))
   }))
 
-  router.put('/api/products/featured', wrap(async (req, res) => {
-    const body = await readBody(req)
-    const parsed = setFeaturedBodySchema.safeParse(body)
-    if (!parsed.success) return json(res, { error: parsed.error.flatten() }, 400)
-    json(res, await service.setFeatured(parsed.data.scope, parsed.data.items))
-  }))
+  // PUT /api/products/featured is intentionally disabled — no auth mechanism
+  // is in place to protect this write endpoint. Manage featured products via
+  // the seed script (pnpm seed) or direct database edits instead.
 
   router.get('/api/products/:id', wrap(async (_req, res, params) => {
     const parsed = productIdParamSchema.safeParse({ id: params.id })

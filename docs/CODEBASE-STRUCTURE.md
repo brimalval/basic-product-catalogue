@@ -134,17 +134,15 @@ The visual layer is driven by CSS custom properties in `src/styles/theme.css` (w
 
 ### Managing featured products
 
-Featured product lists are stored in SQLite (`FeaturedProductPreference` table). To update them without reseeding the database, call the write endpoint directly:
+Featured product lists are stored in SQLite (`FeaturedProductPreference` table). The write endpoint (`PUT /api/products/featured`) is disabled — manage featured products via the seed script or direct database edits.
+
+To update featured products, edit `prisma/seed.ts` and re-run:
 
 ```bash
-curl -X PUT http://localhost:3001/api/products/featured \
-  -H "Content-Type: application/json" \
-  -d '{"scope":"global","items":[{"productId":1,"rank":1},{"productId":3,"rank":2}]}'
+pnpm seed
 ```
 
-The `scope` field matches the value used by `GET /api/products/featured?scope=`. Category scopes must exactly match the category string returned by `GET /api/categories` (e.g. `"men's clothing"`).
-
-To reset to the seeded defaults: `pnpm seed` (re-runs `prisma/seed.ts`, which upserts — safe to run repeatedly).
+The seed script upserts records, so it is safe to run repeatedly without creating duplicates. The `scope` field is `"global"` for the home page carousel and the category slug (e.g. `"men's clothing"`) for category-page carousels — values must exactly match what `GET /api/categories` returns.
 
 ## Extracting a module to a microservice
 
