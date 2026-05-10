@@ -21,8 +21,8 @@ const CATEGORY_FEATURED: Record<string, Array<{ productId: number; rank: number 
     { productId: 6, rank: 2 },
   ],
   "men's clothing": [
-    { productId: 14, rank: 1 },
-    { productId: 15, rank: 2 },
+    { productId: 3, rank: 1 },
+    { productId: 4, rank: 2 },
   ],
   "women's clothing": [
     { productId: 17, rank: 1 },
