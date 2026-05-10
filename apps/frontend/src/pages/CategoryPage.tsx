@@ -1,10 +1,13 @@
 import { useParams, useSearchParams } from 'react-router-dom'
 import { useFeatured, useCategoryProducts } from '@/hooks/use-catalog'
 import { ProductCard } from '@/components/catalog/ProductCard'
+import { ProductCarousel } from '@/components/catalog/ProductCarousel'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import { SortFilterBar, sortProducts } from '@/components/catalog/SortFilterBar'
 import { useInfiniteItems } from '@/hooks/use-infinite-items'
+import { ScrollToTop } from '@/components/ui/ScrollToTop'
+import { useSeo } from '@/hooks/use-seo'
 import type { SortKey } from '@/components/catalog/SortFilterBar'
 
 export function CategoryPage() {
@@ -32,21 +35,20 @@ export function CategoryPage() {
 
   return (
     <main className="container mx-auto px-4 py-8">
+      {useSeo({ title: label, description: `Browse ${label} products.`, path: `/categories/${encodeURIComponent(decoded)}` })}
       <Breadcrumb crumbs={crumbs} />
 
       <section className="mb-10">
         <h1 className="text-3xl font-bold tracking-tight mb-1 capitalize">{decoded}</h1>
         <p className="text-muted-foreground mb-6">Top rated picks</p>
         {loadingFeatured ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-56 rounded-lg" />
             ))}
           </div>
         ) : featured && featured.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {featured.map((p) => <ProductCard key={p.id} product={p} />)}
-          </div>
+          <ProductCarousel products={featured} title={`Featured in ${label}`} />
         ) : (
           <p className="text-muted-foreground text-sm">No featured picks for this category yet.</p>
         )}
@@ -75,6 +77,7 @@ export function CategoryPage() {
           </>
         )}
       </section>
+      <ScrollToTop />
     </main>
   )
 }

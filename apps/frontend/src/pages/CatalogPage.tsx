@@ -4,6 +4,8 @@ import { ProductCard } from '@/components/catalog/ProductCard'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SortFilterBar, sortProducts } from '@/components/catalog/SortFilterBar'
 import { useInfiniteItems } from '@/hooks/use-infinite-items'
+import { ScrollToTop } from '@/components/ui/ScrollToTop'
+import { useSeo } from '@/hooks/use-seo'
 import type { SortKey } from '@/components/catalog/SortFilterBar'
 
 export function CatalogPage() {
@@ -23,6 +25,7 @@ export function CatalogPage() {
 
   return (
     <main className="container mx-auto px-4 py-8">
+      {useSeo({ title: 'All Products', description: 'Browse our full catalog of quality products.', path: '/products' })}
       <div className="flex items-baseline justify-between mb-4">
         <h1 className="text-3xl font-bold tracking-tight">
           {q ? `Results for "${q}"` : 'All Products'}
@@ -46,6 +49,7 @@ export function CatalogPage() {
           {hasMore && <div ref={sentinelRef} className="h-10" />}
         </>
       )}
+      <ScrollToTop />
     </main>
   )
 }
