@@ -17,6 +17,7 @@ export interface FeaturedProductPreference {
 
 export interface IFeaturedRepository {
   findByScope(scope: string): Promise<FeaturedProductPreference[]>
+  setFeaturedForScope(scope: string, items: Array<{ productId: number; rank: number }>): Promise<void>
 }
 
 export interface ProductProvider {

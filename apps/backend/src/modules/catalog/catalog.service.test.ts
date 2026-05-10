@@ -51,6 +51,7 @@ function makeProvider(overrides: Partial<ProductProvider> = {}): ProductProvider
 function makeFeaturedRepo(overrides: Partial<IFeaturedRepository> = {}): IFeaturedRepository {
   return {
     findByScope: vi.fn().mockResolvedValue([]),
+    setFeaturedForScope: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }
 }

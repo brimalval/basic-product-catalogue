@@ -38,4 +38,9 @@ export class CatalogService {
     const prefs = await this.featuredRepo.findByScope(scope)
     return Promise.all(prefs.map((p) => this.provider.getProduct(p.productId)))
   }
+
+  async setFeatured(scope: string, items: Array<{ productId: number; rank: number }>): Promise<Product[]> {
+    await this.featuredRepo.setFeaturedForScope(scope, items)
+    return this.getFeatured(scope)
+  }
 }

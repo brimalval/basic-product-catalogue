@@ -15,3 +15,13 @@ export const categoryParamSchema = z.object({
 export const scopeQuerySchema = z.object({
   scope: z.string().default('global'),
 })
+
+export const setFeaturedBodySchema = z.object({
+  scope: z.string().min(1),
+  items: z.array(
+    z.object({
+      productId: z.number().int().positive(),
+      rank: z.number().int().min(1),
+    }),
+  ),
+})

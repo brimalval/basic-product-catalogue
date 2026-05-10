@@ -29,6 +29,7 @@ export class Router {
 
   get(path: string, handler: Handler): void { this.add('GET', path, handler) }
   post(path: string, handler: Handler): void { this.add('POST', path, handler) }
+  put(path: string, handler: Handler): void { this.add('PUT', path, handler) }
 
   async handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const url = new URL(req.url ?? '/', 'http://localhost')
