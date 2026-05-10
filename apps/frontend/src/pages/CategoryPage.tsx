@@ -26,6 +26,7 @@ export function CategoryPage() {
   const label = decoded.charAt(0).toUpperCase() + decoded.slice(1)
   const crumbs = [
     { label: 'Home', href: '/' },
+    { label: 'Categories', href: '/categories' },
     { label: label },
   ]
 
