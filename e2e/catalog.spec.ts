@@ -10,8 +10,9 @@ test.describe('Home page', () => {
 
   test('header has nav links and search', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('link', { name: 'Home' })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Products' })).toBeVisible()
+    const nav = page.getByRole('navigation', { name: 'Primary navigation' })
+    await expect(nav.getByRole('link', { name: 'Home' })).toBeVisible()
+    await expect(nav.getByRole('link', { name: 'Products' })).toBeVisible()
     await expect(page.getByPlaceholder('Search products...')).toBeVisible()
   })
 })
@@ -27,7 +28,7 @@ test.describe('Catalog page', () => {
   test('displays category badges', async ({ page }) => {
     await page.goto('/products')
     await page.waitForSelector('[href^="/products/"]', { timeout: 10_000 })
-    await expect(page.getByText('electronics')).toBeVisible()
+    await expect(page.getByText('electronics').first()).toBeVisible()
   })
 
   test('search results page', async ({ page }) => {
@@ -41,7 +42,7 @@ test.describe('Product detail page', () => {
   test('shows product info', async ({ page }) => {
     await page.goto('/products/1')
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 10_000 })
-    await expect(page.getByText(/\$\d+\.\d{2}/)).toBeVisible()
+    await expect(page.getByText(/\$\d+\.\d{2}/).first()).toBeVisible()
   })
 
   test('shows back link', async ({ page }) => {
@@ -51,6 +52,7 @@ test.describe('Product detail page', () => {
 
   test('shows enquiry form', async ({ page }) => {
     await page.goto('/products/1')
+    await page.getByRole('button', { name: 'Enquire' }).click({ timeout: 10_000 })
     await expect(page.getByRole('heading', { name: 'Make an Enquiry' })).toBeVisible({
       timeout: 10_000,
     })
@@ -61,6 +63,7 @@ test.describe('Product detail page', () => {
 
   test('enquiry form validates required fields', async ({ page }) => {
     await page.goto('/products/1')
+    await page.getByRole('button', { name: 'Enquire' }).click({ timeout: 10_000 })
     await page.waitForSelector('text=Make an Enquiry', { timeout: 10_000 })
     await page.getByRole('button', { name: 'Send Enquiry' }).click()
     await expect(page.getByText('Name is required')).toBeVisible()
@@ -69,6 +72,7 @@ test.describe('Product detail page', () => {
 
   test('enquiry form submits successfully', async ({ page }) => {
     await page.goto('/products/1')
+    await page.getByRole('button', { name: 'Enquire' }).click({ timeout: 10_000 })
     await page.waitForSelector('text=Make an Enquiry', { timeout: 10_000 })
     await page.getByLabel('Name').fill('Test User')
     await page.getByLabel('Email').fill('test@example.com')

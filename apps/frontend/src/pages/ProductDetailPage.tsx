@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { useProduct } from '@/hooks/use-catalog'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -64,6 +64,12 @@ export function ProductDetailPage() {
       <Helmet>
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
+      <Link
+        to="/products"
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+      >
+        ← Back to products
+      </Link>
       <Breadcrumb crumbs={crumbs} />
       <div className="grid gap-8 lg:gap-12 lg:grid-cols-2">
         <div className="aspect-square flex items-center justify-center bg-gradient-to-br from-accent/50 to-muted rounded-xl p-8">
