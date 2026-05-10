@@ -65,14 +65,14 @@ export function ProductDetailPage() {
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
       <Breadcrumb crumbs={crumbs} />
-      <div className="grid gap-12 lg:grid-cols-2">
-        <div className="aspect-square flex items-center justify-center bg-muted rounded-xl p-8">
+      <div className="grid gap-8 lg:gap-12 lg:grid-cols-2">
+        <div className="aspect-square flex items-center justify-center bg-gradient-to-br from-accent/50 to-muted rounded-xl p-8">
           <img src={product.image} alt={product.title} className="max-h-80 object-contain" />
         </div>
-        <div className="space-y-4">
+        <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
           <Badge variant="secondary" className="capitalize">{product.category}</Badge>
           <h1 className="text-2xl font-bold leading-tight">{product.title}</h1>
-          <p className="text-3xl font-bold">${product.price.toFixed(2)}</p>
+          <p className="text-3xl font-bold text-primary">${product.price.toFixed(2)}</p>
           <StarRating rate={product.rating.rate} count={product.rating.count} size="md" />
           <p className="text-muted-foreground leading-relaxed">{product.description}</p>
 

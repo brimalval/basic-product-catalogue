@@ -1,5 +1,5 @@
-import { useSearchParams, Link } from 'react-router-dom'
-import { Badge } from '@/components/ui/badge'
+import { useSearchParams } from 'react-router-dom'
+import { cn } from '@/lib/utils'
 import type { Product } from '@/lib/types'
 
 export type SortKey = 'price_asc' | 'price_desc' | 'rating_desc' | 'name_asc'
@@ -24,12 +24,12 @@ export function sortProducts(products: Product[], sort: SortKey): Product[] {
 
 interface Props {
   categories?: string[]
-  activeCategory?: string
 }
 
-export function SortFilterBar({ categories, activeCategory }: Props) {
+export function SortFilterBar({ categories }: Props) {
   const [searchParams, setSearchParams] = useSearchParams()
   const sort = (searchParams.get('sort') ?? 'rating_desc') as SortKey
+  const activeCats = searchParams.getAll('cat')
 
   function handleSort(value: SortKey) {
     setSearchParams((prev) => {
@@ -39,8 +39,30 @@ export function SortFilterBar({ categories, activeCategory }: Props) {
     })
   }
 
+  function toggleCategory(cat: string) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      const current = next.getAll('cat')
+      next.delete('cat')
+      if (current.includes(cat)) {
+        current.filter(c => c !== cat).forEach(c => next.append('cat', c))
+      } else {
+        [...current, cat].forEach(c => next.append('cat', c))
+      }
+      return next
+    })
+  }
+
+  function clearCategories() {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      next.delete('cat')
+      return next
+    })
+  }
+
   return (
-    <div className="flex flex-wrap items-center gap-3 mb-6">
+    <div className="flex flex-col gap-3 mb-6">
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground shrink-0">Sort:</span>
         <select
@@ -53,19 +75,39 @@ export function SortFilterBar({ categories, activeCategory }: Props) {
           ))}
         </select>
       </div>
+
       {categories && categories.length > 0 && (
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-sm text-muted-foreground shrink-0">Filter:</span>
-          {categories.map((cat) => (
-            <Link key={cat} to={`/categories/${encodeURIComponent(cat)}`}>
-              <Badge
-                variant={activeCategory === cat ? 'default' : 'outline'}
-                className="capitalize cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+        <div className="flex items-start gap-2">
+          <span className="text-sm text-muted-foreground shrink-0 mt-1">Filter:</span>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => {
+              const isActive = activeCats.includes(cat)
+              return (
+                <button
+                  key={cat}
+                  onClick={() => toggleCategory(cat)}
+                  className={cn(
+                    'inline-flex items-center gap-1 rounded-full text-xs font-medium px-3 py-1.5 capitalize',
+                    'transition-colors duration-200',
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'border border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                  )}
+                >
+                  {cat}
+                  {isActive && <span className="ml-0.5 opacity-80 text-[10px] leading-none">×</span>}
+                </button>
+              )
+            })}
+            {activeCats.length > 0 && (
+              <button
+                onClick={clearCategories}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors px-1"
               >
-                {cat}
-              </Badge>
-            </Link>
-          ))}
+                Clear all
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -11,8 +11,8 @@ interface Props {
 
 export function Breadcrumb({ crumbs }: Props) {
   return (
-    <nav aria-label="Breadcrumb" className="mb-6">
-      <ol className="flex items-center gap-1 text-sm text-muted-foreground">
+    <nav aria-label="Breadcrumb" className="mb-6 min-w-0">
+      <ol className="flex items-center gap-1 text-sm text-muted-foreground flex-wrap">
         {crumbs.map((crumb, i) => (
           <li key={i} className="flex items-center gap-1">
             {i > 0 && <span>/</span>}

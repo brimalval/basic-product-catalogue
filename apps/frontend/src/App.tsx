@@ -10,7 +10,7 @@ import { CategoryPage } from '@/pages/CategoryPage'
 import { CategoriesPage } from '@/pages/CategoriesPage'
 
 export default function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

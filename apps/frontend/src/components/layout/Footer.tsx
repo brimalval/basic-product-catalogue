@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button'
 
 export function Footer() {
   return (
-    <footer className="border-t bg-background mt-16">
-      <div className="container mx-auto px-4 py-10 grid gap-8 sm:grid-cols-3">
+    <footer className="bg-background mt-16">
+      <div className="h-0.5 bg-primary" />
+      <div className="container mx-auto px-4 py-8 sm:py-10 grid gap-6 sm:gap-8 sm:grid-cols-3">
 
         {/* Brand */}
         <div className="space-y-2">

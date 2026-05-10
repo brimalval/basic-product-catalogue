@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useCategories } from '@/hooks/use-catalog'
 import { cn } from '@/lib/utils'
 
@@ -7,8 +7,15 @@ interface Props {
   onToggle: () => void
 }
 
+const NAV_LINKS = [
+  { label: 'Home', href: '/' },
+  { label: 'Products', href: '/products' },
+  { label: 'Categories', href: '/categories' },
+]
+
 export function Sidebar({ isOpen, onToggle }: Props) {
   const { data: categories } = useCategories()
+  const location = useLocation()
 
   return (
     <>
@@ -27,8 +34,9 @@ export function Sidebar({ isOpen, onToggle }: Props) {
           isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
+        {/* Header */}
         <div className="flex items-center justify-between px-4 h-12 border-b shrink-0">
-          <span className="text-sm font-semibold">Categories</span>
+          <span className="text-sm font-semibold">Menu</span>
           <button
             onClick={onToggle}
             aria-label="Close sidebar"
@@ -38,7 +46,39 @@ export function Sidebar({ isOpen, onToggle }: Props) {
           </button>
         </div>
 
-        <nav className="flex flex-col py-2 overflow-y-auto">
+        {/* Primary nav links */}
+        <nav className="py-1 border-b shrink-0">
+          {NAV_LINKS.map(({ label, href }) => {
+            const isActive = href === '/'
+              ? location.pathname === '/'
+              : location.pathname.startsWith(href)
+            return (
+              <Link
+                key={href}
+                to={href}
+                onClick={onToggle}
+                className={cn(
+                  'flex items-center px-4 py-2.5 text-sm transition-colors duration-150',
+                  isActive
+                    ? 'text-primary font-medium bg-primary/10'
+                    : 'text-foreground hover:bg-accent hover:text-foreground'
+                )}
+              >
+                {label}
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* Categories label */}
+        <div className="px-4 pt-3 pb-1 shrink-0">
+          <p className="text-[10px] uppercase tracking-[0.15em] font-semibold text-muted-foreground">
+            Categories
+          </p>
+        </div>
+
+        {/* Category links */}
+        <nav className="flex flex-col pb-4 overflow-y-auto">
           {categories?.map((cat) => (
             <Link
               key={cat}
