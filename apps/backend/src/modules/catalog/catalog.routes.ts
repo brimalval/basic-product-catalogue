@@ -2,7 +2,7 @@ import type { Router } from '../../shared/http/router.js'
 import { json, readBody } from '../../shared/http/helpers.js'
 import { wrap } from '../../shared/http/middleware.js'
 import type { CatalogService } from './catalog.service.js'
-import { productIdParamSchema, setFeaturedBodySchema } from './catalog.schemas.js'
+import { categoryParamSchema, productIdParamSchema, setFeaturedBodySchema } from './catalog.schemas.js'
 
 export function registerCatalogRoutes(router: Router, service: CatalogService): void {
   router.get('/api/products', wrap(async (req, res) => {
@@ -24,17 +24,19 @@ export function registerCatalogRoutes(router: Router, service: CatalogService): 
     json(res, await service.setFeatured(parsed.data.scope, parsed.data.items))
   }))
 
-  router.get('/api/products/:id', wrap(async (req, res, params) => {
+  router.get('/api/products/:id', wrap(async (_req, res, params) => {
     const parsed = productIdParamSchema.safeParse({ id: params.id })
     if (!parsed.success) return json(res, { error: 'Invalid id' }, 400)
     json(res, await service.getProduct(parsed.data.id))
   }))
 
-  router.get('/api/categories', wrap(async (req, res) => {
+  router.get('/api/categories', wrap(async (_req, res) => {
     json(res, await service.getCategories())
   }))
 
-  router.get('/api/categories/:category/products', wrap(async (req, res, params) => {
-    json(res, await service.getCategoryProducts(decodeURIComponent(params.category)))
+  router.get('/api/categories/:category/products', wrap(async (_req, res, params) => {
+    const parsed = categoryParamSchema.safeParse({ category: decodeURIComponent(params.category) })
+    if (!parsed.success) return json(res, { error: 'Invalid category' }, 400)
+    json(res, await service.getCategoryProducts(parsed.data.category))
   }))
 }

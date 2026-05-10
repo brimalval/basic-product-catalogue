@@ -10,6 +10,7 @@ import { createApp } from './app.js'
 import type { MailPort } from './modules/enquiry/enquiry.types.js'
 
 const PORT = Number(process.env.PORT ?? 3001)
+const CORS_ORIGIN = process.env.CORS_ORIGIN ?? '*'
 
 function resolveMailAdapter(): MailPort {
   if (process.env.SMTP_HOST) {
@@ -23,14 +24,15 @@ const db = getClient()
 const catalogService = new CatalogService(fakeStoreAdapter, new PrismaFeaturedRepository(db))
 const enquiryService = new EnquiryService(new PrismaEnquiryRepository(db), resolveMailAdapter())
 
-const server = createApp(catalogService, enquiryService)
+const server = createApp(catalogService, enquiryService, CORS_ORIGIN)
 
+server.setTimeout(30_000)
 server.listen(PORT, () => {
   process.stderr.write(`Backend listening on :${PORT}\n`)
 })
 
 async function shutdown(): Promise<void> {
-  server.close()
+  await new Promise<void>((resolve) => server.close(() => resolve()))
   await disconnectClient()
   process.exit(0)
 }

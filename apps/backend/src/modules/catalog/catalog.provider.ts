@@ -9,6 +9,7 @@ export class UpstreamCatalogError extends Error {
 
 const BASE_URL = 'https://fakestoreapi.com'
 const TIMEOUT_MS = 5000
+const CACHE_TTL_MS = 60_000
 
 async function safeFetch(url: string): Promise<unknown> {
   const controller = new AbortController()
@@ -25,10 +26,34 @@ async function safeFetch(url: string): Promise<unknown> {
   }
 }
 
+function withTtlCache<T>(fn: () => Promise<T>): () => Promise<T> {
+  let cachedValue: T | undefined
+  let expiresAt = 0
+  return async () => {
+    if (cachedValue !== undefined && Date.now() < expiresAt) return cachedValue
+    cachedValue = await fn()
+    expiresAt = Date.now() + CACHE_TTL_MS
+    return cachedValue
+  }
+}
+
+const fetchAllProducts = withTtlCache(
+  () => safeFetch(`${BASE_URL}/products`) as Promise<Product[]>,
+)
+
+const fetchCategories = withTtlCache(
+  () => safeFetch(`${BASE_URL}/products/categories`) as Promise<string[]>,
+)
+
 export const fakeStoreAdapter: ProductProvider = {
-  getProducts: () => safeFetch(`${BASE_URL}/products`) as Promise<Product[]>,
-  getProduct: (id) => safeFetch(`${BASE_URL}/products/${id}`) as Promise<Product>,
-  getCategories: () => safeFetch(`${BASE_URL}/products/categories`) as Promise<string[]>,
+  getProducts: fetchAllProducts,
+  async getProduct(id) {
+    const all = await fetchAllProducts()
+    const product = all.find((p) => p.id === id)
+    if (!product) throw new UpstreamCatalogError(`Product not found: ${id}`)
+    return product
+  },
+  getCategories: fetchCategories,
   getCategoryProducts: (category) =>
     safeFetch(`${BASE_URL}/products/category/${encodeURIComponent(category)}`) as Promise<Product[]>,
 }
