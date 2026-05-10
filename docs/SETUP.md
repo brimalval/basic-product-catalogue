@@ -13,13 +13,30 @@ pnpm install
 
 ## Environment
 
-Create `apps/backend/.env`:
+Create `apps/backend/.env` (copy from `.env.example`):
 
 ```env
 DATABASE_URL="file:./prisma/dev.db"
 PORT=3001
 NODE_ENV=development
 ```
+
+**SMTP (optional — dev stub is active by default)**
+
+When `SMTP_HOST` is set, the enquiry module sends real emails instead of writing to `.dev-mail/`. All SMTP vars are required together:
+
+```env
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=user@example.com
+SMTP_PASS=your-password
+SMTP_FROM=noreply@example.com
+MAIL_TO=sales@example.com
+FRONTEND_URL=https://yourstore.com   # used in email product links
+```
+
+If none of these are set, enquiries are written to `.dev-mail/*.json` (gitignored) — no SMTP configuration needed for local development.
 
 ## Database
 
@@ -76,3 +93,9 @@ pnpm --filter @catalog/frontend preview
 ## Dev mail
 
 Enquiry submissions are written to `.dev-mail/` as JSON files (gitignored). No SMTP setup required.
+
+## Before deploying to production
+
+1. **SEO base URL** — update `BASE_URL` in `apps/frontend/src/hooks/use-seo.ts` and the `<loc>` entries in `apps/frontend/public/sitemap.xml` to your real domain.
+2. **SMTP** — set all `SMTP_*` vars in the production environment (see above).
+3. **SQLite** — swap `DATABASE_URL` for a production-grade database (Postgres recommended) and update `prisma/schema.prisma` `provider` accordingly.

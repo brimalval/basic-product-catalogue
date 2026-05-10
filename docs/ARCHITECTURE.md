@@ -51,7 +51,7 @@ const catalogService = new CatalogService(fakeStoreAdapter, new PrismaFeaturedRe
 const enquiryService = new EnquiryService(new PrismaEnquiryRepository(db), devMailAdapter)
 ```
 
-**Tiny router.** ~50-line `Router` class (no Express/Fastify). Named path params, ordered route matching, async handlers.
+**Tiny router.** ~50-line `Router` class (no Express/Fastify). Named path params, ordered route matching, async handlers. Supports GET, POST, and PUT methods.
 
 ### HTTP endpoints
 
@@ -59,7 +59,8 @@ const enquiryService = new EnquiryService(new PrismaEnquiryRepository(db), devMa
 |--------|------|-------------|
 | GET | /health | Liveness probe |
 | GET | /api/products | All products (supports `?q=` search) |
-| GET | /api/products/featured | Featured products (supports `?scope=`) |
+| GET | /api/products/featured | Featured products (supports `?scope=global\|<category>`) |
+| PUT | /api/products/featured | Replace featured list for a scope (body: `{ scope, items: [{productId, rank}] }`) |
 | GET | /api/products/:id | Single product |
 | GET | /api/categories | All categories |
 | GET | /api/categories/:category/products | Products by category |
@@ -83,16 +84,24 @@ src/
   hooks/
     use-catalog.ts   TanStack Query hooks (products, categories, search, featured)
     use-enquiry.ts   Mutation hook for enquiry submission
+    use-seo.ts       Per-page <Helmet> meta tags (title, description, OG, Twitter, JSON-LD)
+  styles/
+    theme.css    CSS design tokens — edit here to retheme the site (see THEMING.md)
   components/
-    ui/          shadcn/ui primitives (Button, Card, Input, etc.)
-    layout/      Header (nav + search)
-    catalog/     ProductCard
+    ui/          shadcn/ui primitives (Button, Card, Input, Carousel, Dialog, etc.)
+                 ScrollToTop — fixed floating button for infinite-scroll pages
+    layout/      Header (nav, search + live suggestions), Sidebar (category drawer),
+                 Footer (brand, nav links, social, enquiry CTA)
+    catalog/     ProductCard, ProductCarousel, EnquiryModal,
+                 SearchSuggestions (live client-side dropdown), SortFilterBar
   pages/
-    HomePage.tsx           Featured products grid
-    CatalogPage.tsx        All products / search results
-    ProductDetailPage.tsx  Product detail + enquiry form
-  App.tsx        Route definitions
-  main.tsx       React root, QueryClient, BrowserRouter
+    HomePage.tsx           Featured carousel + infinite-scroll browse catalog
+    CatalogPage.tsx        All products / search results with infinite scroll
+    CategoriesPage.tsx     Category grid with thumbnails
+    CategoryPage.tsx       Featured carousel + infinite-scroll products for one category
+    ProductDetailPage.tsx  Product detail + enquiry modal + JSON-LD structured data
+  App.tsx        Route definitions, sidebar state, Footer placement
+  main.tsx       React root, QueryClient, BrowserRouter, HelmetProvider
 ```
 
 ### Data flow
@@ -102,6 +111,22 @@ src/
 3. Backend fetches from Fake Store API (or SQLite), returns JSON.
 4. TanStack Query caches the response (staleTime: 30s). Skeleton UI shown during loading.
 5. For enquiries: `react-hook-form` validates locally with Zod → submits via `useEnquiry` mutation → backend validates again with Zod, persists, triggers mail adapter.
+6. Search suggestions filter the already-cached `useProducts()` result client-side — no extra API calls.
+7. Featured products are fetched from SQLite via `GET /api/products/featured?scope=<scope>`. The `scope` is `global` on the home page and the category slug on category pages.
+
+### Managing featured products
+
+Featured product lists are stored in SQLite (`FeaturedProductPreference` table). To update them without reseeding the database, call the write endpoint directly:
+
+```bash
+curl -X PUT http://localhost:3001/api/products/featured \
+  -H "Content-Type: application/json" \
+  -d '{"scope":"global","items":[{"productId":1,"rank":1},{"productId":3,"rank":2}]}'
+```
+
+The `scope` field matches the value used by `GET /api/products/featured?scope=`. Category scopes must exactly match the category string returned by `GET /api/categories` (e.g. `"men's clothing"`).
+
+To reset to the seeded defaults: `pnpm seed` (re-runs `prisma/seed.ts`, which upserts — safe to run repeatedly).
 
 ## Extracting a module to a microservice
 
