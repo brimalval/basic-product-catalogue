@@ -14,9 +14,15 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header onToggleSidebar={() => setSidebarOpen((v) => !v)} />
-      <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen((v) => !v)} />
-      <div className="flex-1">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-background focus:ring-2 focus:ring-ring focus:rounded-md focus:text-sm"
+      >
+        Skip to main content
+      </a>
+      <Header onToggleSidebar={() => setSidebarOpen((v) => !v)} sidebarOpen={sidebarOpen} />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div id="main-content" tabIndex={-1} className="flex-1 outline-none">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<CatalogPage />} />

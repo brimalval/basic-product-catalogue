@@ -20,7 +20,7 @@ export function Footer() {
         {/* Navigation */}
         <div className="space-y-2">
           <p className="text-sm font-semibold">Quick links</p>
-          <nav className="flex flex-col gap-1">
+          <nav aria-label="Footer navigation" className="flex flex-col gap-1">
             {[
               { label: 'Home', href: '/' },
               { label: 'Products', href: '/products' },
@@ -46,21 +46,13 @@ export function Footer() {
           <Button asChild size="sm" variant="outline">
             <Link to="/products">Browse &amp; Enquire</Link>
           </Button>
-          <div className="flex gap-3 pt-1">
-            <a
-              href="#"
-              aria-label="LinkedIn"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
+          <div aria-hidden="true" className="flex gap-3 pt-1">
+            <span className="text-muted-foreground">
               <Linkedin className="h-4 w-4" />
-            </a>
-            <a
-              href="#"
-              aria-label="Social"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
+            </span>
+            <span className="text-muted-foreground">
               <Globe className="h-4 w-4" />
-            </a>
+            </span>
           </div>
         </div>
 

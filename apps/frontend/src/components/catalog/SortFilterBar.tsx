@@ -64,8 +64,10 @@ export function SortFilterBar({ categories }: Props) {
   return (
     <div className="flex flex-col gap-3 mb-6">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground shrink-0">Sort:</span>
+        <label htmlFor="sort-select" className="text-sm text-muted-foreground shrink-0">Sort:</label>
         <select
+          id="sort-select"
+          name="sort"
           value={sort}
           onChange={(e) => handleSort(e.target.value as SortKey)}
           className="text-sm border rounded-md px-2 py-1 bg-background focus:outline-none focus:ring-1 focus:ring-ring"
@@ -86,6 +88,7 @@ export function SortFilterBar({ categories }: Props) {
                 <button
                   key={cat}
                   onClick={() => toggleCategory(cat)}
+                  aria-pressed={isActive}
                   className={cn(
                     'inline-flex items-center gap-1 rounded-full text-xs font-medium px-3 py-1.5 capitalize',
                     'transition-colors duration-200',
@@ -95,14 +98,15 @@ export function SortFilterBar({ categories }: Props) {
                   )}
                 >
                   {cat}
-                  {isActive && <span className="ml-0.5 opacity-80 text-[10px] leading-none">×</span>}
+                  {isActive && <span aria-hidden="true" className="ml-0.5 opacity-80 text-[10px] leading-none">×</span>}
                 </button>
               )
             })}
             {activeCats.length > 0 && (
               <button
                 onClick={clearCategories}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors px-1"
+                aria-label="Clear all category filters"
+                className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1.5 min-h-[24px] rounded"
               >
                 Clear all
               </button>

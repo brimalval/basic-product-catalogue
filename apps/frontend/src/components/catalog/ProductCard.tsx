@@ -21,7 +21,7 @@ export function ProductCard({ product }: Props) {
           <div className="aspect-square mb-3 flex items-center justify-center bg-muted/60 rounded-md overflow-hidden p-4">
             <img
               src={product.image}
-              alt={product.title}
+              alt=""
               className="w-full h-full object-contain transition-transform duration-[600ms] ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-[1.06]"
             />
           </div>

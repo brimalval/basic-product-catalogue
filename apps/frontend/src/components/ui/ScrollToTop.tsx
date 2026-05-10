@@ -22,7 +22,7 @@ export function ScrollToTop() {
         visible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
       ].join(' ')}
     >
-      <ArrowUp className="h-4 w-4" />
+      <ArrowUp aria-hidden="true" className="h-4 w-4" />
     </Button>
   )
 }

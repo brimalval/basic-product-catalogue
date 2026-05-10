@@ -56,7 +56,7 @@ export function HomePage() {
                 <Link to="/products">
                   Browse Products
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary-foreground/20 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5">
-                    <ArrowRight className="h-3 w-3" />
+                    <ArrowRight aria-hidden="true" className="h-3 w-3" />
                   </span>
                 </Link>
               </Button>
