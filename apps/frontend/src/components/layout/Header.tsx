@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { SearchSuggestions } from '@/components/catalog/SearchSuggestions'
 
 interface Props {
   onToggleSidebar: () => void
@@ -10,10 +11,15 @@ interface Props {
 export function Header({ onToggleSidebar }: Props) {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const closeSuggestions = useCallback(() => setShowSuggestions(false), [])
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
-    if (query.trim()) navigate(`/products?q=${encodeURIComponent(query.trim())}`)
+    if (query.trim()) {
+      navigate(`/products?q=${encodeURIComponent(query.trim())}`)
+      setShowSuggestions(false)
+    }
   }
 
   return (
@@ -38,12 +44,18 @@ export function Header({ onToggleSidebar }: Props) {
         </nav>
 
         <form onSubmit={handleSearch} className="ml-auto flex gap-2">
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products..."
-            className="w-56 sm:w-72"
-          />
+          <div className="relative">
+            <Input
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); setShowSuggestions(true) }}
+              onFocus={() => setShowSuggestions(true)}
+              placeholder="Search products..."
+              className="w-56 sm:w-72"
+            />
+            {showSuggestions && (
+              <SearchSuggestions query={query} onClose={closeSuggestions} />
+            )}
+          </div>
           <Button type="submit" variant="outline" size="sm">Search</Button>
         </form>
       </div>
